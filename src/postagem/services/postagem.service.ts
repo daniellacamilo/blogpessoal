@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Postagem } from "../entities/postagem.entity";
 import { DeleteResult, ILike, Repository } from "typeorm";
+import { TemaService } from "../../tema/services/tema.service";
 
 @Injectable()
 export class PostagemService{
@@ -9,11 +10,15 @@ export class PostagemService{
     constructor(
         @InjectRepository(Postagem)
         private postagemRepository: Repository<Postagem>,
+        private readonly temaService: TemaService
     ){}
 
     async findAll(): Promise<Postagem[]>{
         //SELECT * FROM tb_postagens
         return await this.postagemRepository.find();
+        relations:  {
+            tema: true
+        }
     }
 
     async findById(id: number): Promise<Postagem>{
@@ -21,7 +26,8 @@ export class PostagemService{
         const postagem = await this.postagemRepository.findOne({
             where: {
                 id
-            }
+            },
+            relations: {tema: true}
         })
         if (!postagem)
           throw new HttpException('Postagem não encontrada', HttpStatus.NOT_FOUND);
@@ -31,14 +37,20 @@ export class PostagemService{
 
     async findByTitulo(titulo: string): Promise<Postagem[]>{
         //SELECT * FROM tb_postagens WHERE titulo LIKE '%titulo%'
-        return await this.postagemRepository.find({
+        return this.postagemRepository.find({
             where: {
                 titulo: ILike(`%${titulo}%`) 
-            }
+            },
+                relations: {
+                    tema: true
+                }
         })
     }
     
     async create(postagem: Postagem): Promise<Postagem>{
+
+        await this.temaService.findById(postagem.tema.id);
+
         //INSERT INTO tb_postagens (titulo, texto, data) VALUES (postagem.titulo, postagem.texto, postagem.data)
         return await this.postagemRepository.save(postagem);
     }
@@ -48,7 +60,11 @@ export class PostagemService{
         if (!postagem.id || !postagem.id)
           throw new HttpException('O ID da postagem é inválido', HttpStatus.BAD_REQUEST);
         
+        //Checa se a postagem existe
         await this.findById(postagem.id);
+
+        //Checa se o tema da postagem existe
+        await this.temaService.findById(postagem.tema.id);
 
         return this.postagemRepository.save(postagem);
             //UPDATE tb_postagens SET titulo = ?,
@@ -65,10 +81,10 @@ export class PostagemService{
     }
 
     async delete(id: number): Promise<DeleteResult>{
-        let buscaPostagem = await this.findById(id);
+         await this.findById(id);
 
          //DELETE FROM tb_postagens FROM id = ?;
-         return this.postagemRepository.delete(id);
+         return await this.postagemRepository.delete(id);
         // await this.postagemRepository.remove(buscaPostagem);
         // return await this.postagemRepository.delete(id);
     }
