@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Postagem } from "../entities/postagem.entity";
 import { DeleteResult, ILike, Repository } from "typeorm";
 import { TemaService } from "../../tema/services/tema.service";
+import { Usuario } from "../../usuario/entities/usuario.entity";
 
 @Injectable()
 export class PostagemService{
@@ -18,6 +19,7 @@ export class PostagemService{
         return await this.postagemRepository.find();
         relations:  {
             tema: true
+            Usuario: true
         }
     }
 
@@ -27,7 +29,10 @@ export class PostagemService{
             where: {
                 id
             },
-            relations: {tema: true}
+            relations: {
+                tema: true,
+                usuario: true
+            }
         })
         if (!postagem)
           throw new HttpException('Postagem não encontrada', HttpStatus.NOT_FOUND);
@@ -42,7 +47,8 @@ export class PostagemService{
                 titulo: ILike(`%${titulo}%`) 
             },
                 relations: {
-                    tema: true
+                    tema: true,
+                    usuario: true
                 }
         })
     }

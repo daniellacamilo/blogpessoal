@@ -2,9 +2,10 @@ import { Transform, TransformFnParams } from "class-transformer";
 import { IsNotEmpty, Length } from "class-validator";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Tema } from "../../tema/entities/tema.entity";
+import { Usuario } from "../../usuario/entities/usuario.entity";
 
 @Entity({name: "tb_postagens"}) // CREATE TABLE  tb_postagens
-export class Postagem{
+export class Postagem {
     
     @PrimaryGeneratedColumn() //PRIMARY KEY(id) AUTO_INCREMENT
     id:number;
@@ -28,4 +29,10 @@ export class Postagem{
         onDelete: "CASCADE" //Se um tema for deletado, todas as postagens relacionadas a ele também serão deletadas
     })
     tema:Tema; //Chave estrangeira para a tabela de temas
+
+    @ManyToOne(() => Usuario, (usuario) => usuario.postagem, {
+        onDelete: "CASCADE"
+    })
+    usuario: Usuario
+
 }
