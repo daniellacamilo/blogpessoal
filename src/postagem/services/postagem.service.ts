@@ -5,6 +5,7 @@ import { DeleteResult, ILike, Repository } from "typeorm";
 import { TemaService } from "../../tema/services/tema.service";
 import { Usuario } from "../../usuario/entities/usuario.entity";
 
+
 @Injectable()
 export class PostagemService{
 
@@ -16,11 +17,13 @@ export class PostagemService{
 
     async findAll(): Promise<Postagem[]>{
         //SELECT * FROM tb_postagens
-        return await this.postagemRepository.find();
-        relations:  {
-            tema: true
-            Usuario: true
-        }
+        return this.postagemRepository.find({
+            relations:  {
+            tema: true,
+            usuario: true
+            }
+        });
+        
     }
 
     async findById(id: number): Promise<Postagem>{
@@ -63,7 +66,7 @@ export class PostagemService{
 
     async update(postagem: Postagem): Promise<Postagem>{
 
-        if (!postagem.id || !postagem.id)
+        if (!postagem.id || postagem.id <= 0)
           throw new HttpException('O ID da postagem é inválido', HttpStatus.BAD_REQUEST);
         
         //Checa se a postagem existe
