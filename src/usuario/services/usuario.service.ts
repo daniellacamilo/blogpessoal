@@ -12,6 +12,7 @@ export class UsuarioService {
         private bcrypt: Bcrypt
     ) { }
 
+    // Não vai ter um endpoint na Controller
     async findByUsuario(usuario: string): Promise<Usuario | null> {
         return await this.usuarioRepository.findOne({
             where: {

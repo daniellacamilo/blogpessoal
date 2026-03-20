@@ -4,8 +4,8 @@ import { UsuarioModule } from "../usuario/usuario.module";
 import { PassportModule } from "@nestjs/passport";
 import { JwtModule } from "@nestjs/jwt";
 import { jwtConstants } from "./constants/constant";
-import { AuthService } from "./services/auth.service";
 import { AuthController } from "./controllers/auth.controller";
+import { AuthService } from "./services/auth.service";
 import { LocalStrategy } from "./strategy/local.strategy";
 import { JwtStrategy } from "./strategy/jwt.strategy";
 
@@ -15,12 +15,16 @@ import { JwtStrategy } from "./strategy/jwt.strategy";
         PassportModule,
         JwtModule.register({
             secret: jwtConstants.secret,
-            signOptions: {expiresIn: "1h"},
+            signOptions: { expiresIn: '1h' },
         })
-
+    ],
+    providers: [
+        Bcrypt,
+        AuthService,
+        LocalStrategy,
+        JwtStrategy,
     ],
     controllers: [AuthController],
-    providers: [Bcrypt, AuthService, LocalStrategy, JwtStrategy],
     exports: [Bcrypt],
 })
 export class AuthModule {};
