@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Usuario } from '../entities/usuario.entity';
-import { Bcrypt } from '../../auth/bcrypt/bcrypt';
+import { Bcrypt } from '../../auth//brcypt/bcrypt';
 
 @Injectable()
 export class UsuarioService {
@@ -12,11 +12,10 @@ export class UsuarioService {
         private bcrypt: Bcrypt
     ) { }
 
-    // Não vai ter um endpoint na Controller
     async findByUsuario(usuario: string): Promise<Usuario | null> {
         return await this.usuarioRepository.findOne({
             where: {
-                usuario: usuario
+                usuario: usuario 
             }
         })
     }
